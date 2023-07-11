@@ -22,7 +22,7 @@ pipeline {
                 script {
                     def dockerCmd = 'docker run -p 3080:3080 -d melvinkimathi/react-nodejs-example:v2'
                     sshagent(['ec2-server-key']) {
-                        sh "ssh -o StrictHostKeyChecking=no ec2-user@54.91.109.125 ${dockerCmd}"
+                        sh "ssh -o StrictHostKeyChecking=no ec2-user@3.85.198.217 ${dockerCmd}"
                     }
                 }
             }
