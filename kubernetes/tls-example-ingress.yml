@@ -1,0 +1,23 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: tls-example-ingress
+spec:
+  tls:
+  - hosts:
+      - myapp.com
+    secretName: myapp-secret-tls
+  rules:
+  - host: myapp.com
+    http:
+      paths:
+      - pathType: Prefix
+        path: /
+        backend:
+          service:
+            name: myapp-internal-service
+            port: 
+              number: 8080
+
+
+# tls certificate secret and ingress have to be in the same namespace
