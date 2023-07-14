@@ -1,0 +1,29 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: mypod
+spec:
+  containers:
+  - name: myfrontend
+    image: nginx
+    volumeMounts:
+    - mountPath: "/var/www/html"
+      name: mypd
+    resources:
+      limits:
+        memory: "128Mi"
+        cpu: "500m"
+    ports:
+      - containerPort: 3000
+  volumes:
+    - name: mypd
+      persistentVolumeClaim:
+        claimName: pvc-name
+
+
+# Persistent Volume Claims must exist in the same namespace with the pods.
+
+# a pod can actually use multiple volumes types simutaneously
+# for instance: an application that needs a configuration file mounted though a configMap, needs a tls certificate mounted as 
+# a secret, database storage etc
+

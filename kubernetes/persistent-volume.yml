@@ -1,0 +1,29 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: pv-name
+spec:
+  capacity:
+    storage: 5Gi
+  volumeMode: Filesystem
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Recycle
+  storageClassName: slow
+  mountOptions:
+    - hard
+    - nfsvers=4.1
+  nfs:
+    path: <dir-path>
+    server: <server-ip>
+
+
+# Persistent Volumes are not namespaced.
+# Persistent Volume Claims must exist in the same namespace with the pods.
+
+# a pod can actually use multiple volumes types simutaneously
+# for instance: an application that needs a configuration file mounted though a configMap, needs a tls certificate mounted as 
+# a secret, database storage etc
+
+# <dir-path> - replaces with the actual directory path
+#  <server-ip> - replace with the server ip address
