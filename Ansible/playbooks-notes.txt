@@ -1,0 +1,35 @@
+1.Playbooks
+- set of tasks to execute on a target machine
+- To execute a Playbook i.e
+ansible-playbook -i <hosts file> <playbook file> eg
+ansible-playbook -i hosts playbook.yaml
+
+2. Idempotency
+- Ansible compares Actual state vs Desired state.
+
+3. Collections vs Modules in Ansible || Module index vs Collection index
+- Collection: packaging format for building and distributing Ansible content
+- can be released and installed independent of other Collections.
+- as of 2.10, all modules were grouped into Collections.
+- To list available Collections:
+ansible-galaxy collection list 
+- Ansible Galaxy --> hub for storing Ansible Collections.
+
+4. Ansible plugins
+- pieces of code that add to Ansible's functionality or modules.
+- You can also write your own Plugins.
+
+
+NB:
+- To check whether a service is running:
+ps aux | grep <service-name> eg
+ps aux | grep nginx
+- To check nginx version
+nginx -v
+- For ansible version 2.9 and earlier, all modules were included in the 
+ansible distribution that you install.
+- as for Ansible version 2.10, modules and plugins moved into various "Collections"
+so Ansible was divided into two
+i) Ansible code - ansible base package
+contains the core Ansible programs
+ii) Ansible module and Plugins

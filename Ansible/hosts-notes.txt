@@ -1,0 +1,75 @@
+Ansible
+1. Host file
+- File containing data about the Ansible client servers
+- Tells Ansible the IP Addresses of the server it has to manage.
+- "hosts" - meaning the managed servers
+- default location: /etc/ansible/hosts
+- sample host file contents
+(Ansible uses the PRIVATE KEY not public key)
+134.56.78.99 ansible_ssh_private_key_file=~/.ssh/id_rsa ansible_user=ubuntu
+134.50.78.90 ansible_ssh_private_key_file=~/.ssh/id_rsa ansible_user=ubuntu
+
+2. Ansible ad-hoc commands
+- provides a faster way to interact with the desired servers
+- ad-hoc commands pattern
+ansible <pattern> -m <module> -a "<module options>"
+eg ansible all -i hosts -m ping 
+all --> target all servers
+hosts --> target inventory
+ping --> ping module
+
+3. Grouping servers in a hosts file
+- NB: one host can belong to more than group.
+[database]
+134.56.78.99
+134.56.70.90
+
+[database:vars]
+ansible_ssh_private_key_file=~/.ssh/id_rsa
+ansible_user=root
+
+[web_servers]
+12.45.78.99
+34.56.70.90
+
+[web_servers:vars]
+ansible_ssh_private_key_file=~/.ssh/id_rsa
+ansible_user=root
+
+[ec2]
+ec2-15-190-239-1.eu-west-3.compute.amazonaws.com
+ec2-15-188-239-5.eu-west-3.compute.amazonaws.com ansible_python_interpreter=/usr/bin/python3
+
+[ec2:vars]
+ansible_ssh_private_key_file=~/Downloads/ansible.pem (remember to do: "chmod 400 ~/Downloads/ansible.pem")
+ansible_user=ec2
+ansible_python_interpreter=/usr/bin/python3
+
+- To target only the database group
+ansible database -i hosts -m ping
+- To target only the web_servers group
+ansible web_servers -i hosts -m ping
+- To target only the ec2 group
+ansible ec2 -i hosts -m ping
+- To target a specific server
+ansible 172.34.56.90 -i hosts -m ping
+- To override the default python interpreter
+ansible_python_interpreter=/usr/bin/python3
+
+4. Authorized Keys and Known Hosts 
+- known hosts --> ~/.ssh/known_hosts
+- To add an entry about a specific server to the known hosts file:
+ssh-keyscan -H <ip-address> >> ~/.ssh/known_hosts eg
+ssh-keyscan -H 165.22.201.197 >> ~/.ssh/known_hosts
+ssh-keyscan -H 188.166.30.219 >> ~/.ssh/known_hosts
+- For a remote server to authenticate the local machine:
+1. The target remote server has to have the public ssh key.
+- To copy an ssh public key to a remote host
+ssh-copy-id root@188.166.30.219
+ssh-copy-id root@190.168.30.219
+- To disable Host key checking
+1. Mostly suited for Ephemeral Infrastructure: servers are dynamically created and destroyed.
+2. default ansible configuration location --> ~/.ansible.cfg  || /etc/ansible/ansible.cfg
+To disable host key checking in the ansible.cfg file: 
+[defaults]
+host_key_checking = False

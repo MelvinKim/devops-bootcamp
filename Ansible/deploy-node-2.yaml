@@ -1,0 +1,63 @@
+---
+- name: Install node and npm
+  hosts: web_servers
+  tasks:
+    - name: Update package repository
+      apt:
+        update_cache: yes
+        force_apt_get: yes
+        cache_valid_time: 3600
+    - name: Install nodejs and npm
+      apt:
+        pkg:
+          - nodejs
+          - npm
+
+- name: Create new linux user for node app
+  hosts: web_servers
+  tasks:
+    - name: Create linux user 
+      user: 
+        name: nana 
+        comment: Nana Admin
+        group: admin
+      register: user_creation_result
+    - debug: msg={{user_creation_result}}
+
+- name: Deploy nodejs application
+  hosts: web_servers
+  become: True
+  become_user: nana
+  vars:
+    - node_file_location: /Users/melvinkimathi/projects/nodejs-app/nodejs-app-1.0.0.tgz
+    - version: 1.0.0
+    - destination: /home/nana
+  tasks:
+    - name: Copy nodejs folder to a server
+      copy:
+        src: "{{node_file_location}}"
+        dest: /home/nana/app-1.0.0.tgz
+    - name: Unpack the nodejs tar file
+      unarchive:
+        src: "{{destination}}/app-{{version}}.tgz"
+        dest: "{{destination}}"
+        remote_src: yes # source attribute / file path has to be on the remote server
+      register: unpacking_result
+    - debug: msg={{unpacking_result}}
+    - name: Install dependencies
+      npm:
+        path: "{{destination}}/package"
+    - name: Start the application
+      command:
+        chdir: "{{destination}}/package/app"
+        cmd: node server
+      async: 1000
+      poll: 0
+    - name: Ensure app is running
+      shell: ps aux | grep node
+      register: app_status
+    - debug: msg={{app_status.stdout_lines}}
+        
+# To pass variables in the cmd: examples
+# ansible-playbook -i hosts deploy-node.yaml -e "version=1.0.0 node_file_location=/home/nana"
+# ansible-playbook -i hosts deploy-node.yaml -extra-vars "version=1.0.0 node_file_location=/home/nana"

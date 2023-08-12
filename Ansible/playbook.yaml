@@ -1,0 +1,47 @@
+---
+- name: Configure nginx web server
+  hosts: web_servers
+  tasks:
+  - name: Install nginx server
+    apt:
+      name: nginx
+      state: latest
+  - name: Uninstall nginx server
+    apt:
+      name: nginx
+      state: absent
+  - name: Install specific nginx version
+    apt:
+      name: nginx=1.18.0-0ubuntu1
+      state: present
+  - name: Install specific nginx version - using regular expression
+    apt:
+      name: nginx=1.18*
+      state: present
+  - name: Start nginx server
+    service:
+      name: nginx
+      state: started
+  - name: Stop nginx server
+    service:
+      name: nginx
+      state: stopped
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# each host or ip address defined in the hosts part, must be defined the hosts file

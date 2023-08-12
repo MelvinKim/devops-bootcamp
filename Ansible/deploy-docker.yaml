@@ -1,0 +1,97 @@
+--- 
+- name: Install python3 and docker
+  hosts: terraform_docker_server
+  become: yes
+  gather_facts: False
+  tasks:
+    - name: Install python3 and docker 
+      vars:
+        ansible_python_interpreter: /usr/bin/python
+      yum:
+        name:
+          - python3
+          - docker
+        update_cache: yes 
+        state: present
+
+- name: Install docker compose
+  hosts: terraform_docker_server
+  become: yes
+  tasks:
+    - name: Install docker-compose
+      get_url:
+        url: https://github.com/docker/compose/releases/download/1.27.4/docker-compose-Linux-{{lookup('pipe', 'uname -m')}}
+        dest: /usr/local/bin/docker-compose
+        mode: +x
+
+- name: Start docker
+  hosts: terraform_docker_server
+  become: yes
+  tasks: 
+    - name: Ensure docker is running
+      systemd: 
+        name: docker
+        state: started
+    - name: Install docker python module
+      pip: 
+        name: 
+          - docker
+          - docker-compose
+
+- name: Add ec2-user to docker group 
+  hosts: terraform_docker_server
+  become: yes
+  tasks:
+    - name: Add ec2-user to docker group
+      user:
+        name: ec2-user
+        groups: docker
+        append: yes
+    - name: Reconnect to the server - for the user-group modifications to take effect
+      meta: reset_connection
+
+- name: Start docker containers
+  hosts: terraform_docker_server
+  vars_files:
+    - project_vars
+  tasks:
+    - name: Copy docker-compose.yaml file
+      copy:
+        src: /Users/melvinkimathi/docker-compose.yaml
+        dest: /home/ec2-user/docker-compose.yaml
+    - name: Docker login
+      docker_login:
+        username: <docker-hub-username>
+        password: "{{docker_hub_password}}"
+    - name: Start container from compose
+      docker_compose:
+        project_src: /home/ec2-user
+        state: present
+
+
+- name: Test docker pull
+  hosts: terraform_docker_server
+  tasks:
+    - name: Pull redis
+      community.docker.docker_image:
+        name: redis
+        source: pull
+
+
+
+
+
+# - name: Start docker containers
+#   hosts: terraform_docker_server
+#   vars_prompt:
+#     - name: docker_password
+#       prompt: Enter password for docker registry
+#   tasks:
+#     - name: Copy docker-compose.yaml file
+#       copy:
+#         src: /Users/melvinkimathi/docker-compose.yaml
+#         dest: /home/ec2-user/docker-compose.yaml
+#     - name: Docker login
+#       docker_login:
+#         username: <docker-hub-username>
+#         password: "{{docker_password}}"

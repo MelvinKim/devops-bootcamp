@@ -1,0 +1,7 @@
+1. Ansible project 1
+- Deploy Nodejs App
+- Steps (Automated):
+1. Install node and npm on target server
+2. Copy Node artifact and unpack
+    how to create a node artifact --> npm pack
+3. Start the Application
