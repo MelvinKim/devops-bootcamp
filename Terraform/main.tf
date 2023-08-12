@@ -9,6 +9,7 @@ variable env_prefix {}
 variable instance_type {}
 variable ssh_key {}
 variable my_ip {}
+var ssh_key_private {}
 
 data "aws_ami" "amazon-linux-image" {
   most_recent = true
@@ -127,27 +128,35 @@ resource "aws_instance" "myapp-server" {
     Name = "${var.env_prefix}-server"
   }
 
-#   user_data = <<EOF
-#                  #!/bin/bash
-#                  apt-get update && apt-get install -y docker-ce
-#                  systemctl start docker
-#                  usermod -aG docker ec2-user
-#                  docker run -p 8080:8080 nginx
-#               EOF
+  # provisioner "local-exec" {
+  #   working_dir = "../Ansible/"
+  #   command = "ansible-playbook --inventory ${self.public_ip}, --private-key ${var.ssh_key_private} --user ${var.ansible_user} deploy-docker.yaml"
+  # }
 }
 
-resource "aws_instance" "myapp-server-two" {
-  ami                         = data.aws_ami.amazon-linux-image.id
-  instance_type               = var.instance_type
-  key_name                    = "myapp-key"
-  associate_public_ip_address = true
-  subnet_id                   = aws_subnet.myapp-subnet-1.id
-  vpc_security_group_ids      = [aws_security_group.myapp-sg.id]
-  availability_zone			      = var.avail_zone
-
-  tags = {
-    Name = "${var.env_prefix}-server-two"
+# null resource
+resource "null_resource" "configure_server" {
+  triggers = {
+    trigger = aws_instance.myapp-server.public_ip
   }
+  provisioner "local-exec" {
+    working_dir = "../Ansible/"
+    command = "ansible-playbook --inventory ${aws_instance.myapp-server.public_ip}, ${aws_instance.myapp-server-two.public_ip} --private-key ${var.ssh_key_private} --user ${var.ansible_user} deploy-docker.yaml"
+  }
+}
+
+# resource "aws_instance" "myapp-server-two" {
+#   ami                         = data.aws_ami.amazon-linux-image.id
+#   instance_type               = var.instance_type
+#   key_name                    = "myapp-key"
+#   associate_public_ip_address = true
+#   subnet_id                   = aws_subnet.myapp-subnet-1.id
+#   vpc_security_group_ids      = [aws_security_group.myapp-sg.id]
+#   availability_zone			      = var.avail_zone
+
+#   tags = {
+#     Name = "${var.env_prefix}-server-two"
+#   }
 
 #   user_data = <<EOF
 #                  #!/bin/bash
@@ -156,4 +165,4 @@ resource "aws_instance" "myapp-server-two" {
 #                  usermod -aG docker ec2-user
 #                  docker run -p 8080:8080 nginx
 #               EOF
-}
+# }
