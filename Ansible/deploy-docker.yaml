@@ -1,6 +1,6 @@
 --- 
 - name: Wait for ssh connection
-  hosts: all
+  hosts: aws_ec2
   gather_facts: False
   tasks:
     - name: Ensure ssh port is open
@@ -15,7 +15,7 @@
         ansible_python_interpreter: /usr/bin/python
 
 - name: Install python3 and docker
-  hosts: all
+  hosts: aws_ec2
   become: yes
   gather_facts: False
   tasks:
@@ -30,7 +30,7 @@
         state: present
 
 - name: Install docker compose
-  hosts: all
+  hosts: aws_ec2
   become: yes
   tasks:
     - name: Install docker-compose
@@ -40,7 +40,7 @@
         mode: +x
 
 - name: Start docker
-  hosts: all
+  hosts: aws_ec2
   become: yes
   tasks: 
     - name: Ensure docker is running
@@ -54,7 +54,7 @@
           - docker-compose
 
 - name: Add ec2-user to docker group 
-  hosts: all
+  hosts: aws_ec2
   become: yes
   tasks:
     - name: Add ec2-user to docker group
@@ -66,7 +66,7 @@
       meta: reset_connection
 
 - name: Start docker containers
-  hosts: all
+  hosts: aws_ec2
   vars_files:
     - project_vars
   tasks:
@@ -85,7 +85,7 @@
 
 
 - name: Test docker pull
-  hosts: all
+  hosts: aws_ec2
   tasks:
     - name: Pull redis
       community.docker.docker_image:

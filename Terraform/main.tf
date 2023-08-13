@@ -32,6 +32,7 @@ output "ami_id" {
 
 resource "aws_vpc" "myapp-vpc" {
   cidr_block = var.vpc_cidr_block
+  enable_dns_hostnames = true
   tags = {
       Name = "${var.env_prefix}-vpc"
   }
@@ -145,24 +146,31 @@ resource "null_resource" "configure_server" {
   }
 }
 
-# resource "aws_instance" "myapp-server-two" {
-#   ami                         = data.aws_ami.amazon-linux-image.id
-#   instance_type               = var.instance_type
-#   key_name                    = "myapp-key"
-#   associate_public_ip_address = true
-#   subnet_id                   = aws_subnet.myapp-subnet-1.id
-#   vpc_security_group_ids      = [aws_security_group.myapp-sg.id]
-#   availability_zone			      = var.avail_zone
+resource "aws_instance" "myapp-server-two" {
+  ami                         = data.aws_ami.amazon-linux-image.id
+  instance_type               = var.instance_type
+  key_name                    = "myapp-key"
+  associate_public_ip_address = true
+  subnet_id                   = aws_subnet.myapp-subnet-1.id
+  vpc_security_group_ids      = [aws_security_group.myapp-sg.id]
+  availability_zone			      = var.avail_zone
 
-#   tags = {
-#     Name = "${var.env_prefix}-server-two"
-#   }
+  tags = {
+    Name = "${var.env_prefix}-server-two"
+  }
 
-#   user_data = <<EOF
-#                  #!/bin/bash
-#                  apt-get update && apt-get install -y docker-ce
-#                  systemctl start docker
-#                  usermod -aG docker ec2-user
-#                  docker run -p 8080:8080 nginx
-#               EOF
-# }
+}
+
+resource "aws_instance" "myapp-server-three" {
+  ami                         = data.aws_ami.amazon-linux-image.id
+  instance_type               = "t2.small"
+  key_name                    = "myapp-key"
+  associate_public_ip_address = true
+  subnet_id                   = aws_subnet.myapp-subnet-1.id
+  vpc_security_group_ids      = [aws_security_group.myapp-sg.id]
+  availability_zone			      = var.avail_zone
+
+  tags = {
+    Name = "${var.env_prefix}-server-three"
+  }
+}

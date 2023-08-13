@@ -1,0 +1,19 @@
+---
+- name: Deploy application in new namespace
+  hosts: localhost
+  vars:
+    - kubeconfig: /Users/karutikimathi/playground/DevOps/Terraform/kubeconfig_myapp-eks-cluster # path to kubeconfig
+  tasks:
+    - name: Create a k8s namespace
+      k8s:
+        name: my-app
+        api_version: v1
+        kind: Namespace
+        state: present
+        kubeconfig: {{kubeconfig}}
+    - name: Deploy nginx app
+      k8s:
+        src: <k8s manifest filepath>
+        state: present
+        kubeconfig: {{kubeconfig}}
+        namespace: my-app

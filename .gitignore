@@ -3,3 +3,4 @@ aws-commands.md
 kubectl-commands.md
 aws-eks-k8s.md
 terraform.tfvars
+kubeconfig_myapp-eks-cluster
