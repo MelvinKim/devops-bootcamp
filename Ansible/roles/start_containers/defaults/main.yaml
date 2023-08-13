@@ -1,0 +1,3 @@
+docker_registry: <AWS_ECR_URL>
+docker_username: AWS
+docker_password: <ECR_PASSWORD>

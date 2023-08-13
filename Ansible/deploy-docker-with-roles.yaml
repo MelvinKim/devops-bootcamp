@@ -69,9 +69,19 @@
   hosts: aws_ec2
   vars_files:
     - project_vars
-  roles:
-    - start_containers
-    
+  tasks:
+    - name: Copy docker-compose.yaml file
+      copy:
+        src: /Users/melvinkimathi/docker-compose.yaml
+        dest: /home/ec2-user/docker-compose.yaml
+    - name: Docker login
+      docker_login:
+        username: <docker-hub-username>
+        password: "{{docker_hub_password}}"
+    - name: Start container from compose
+      docker_compose:
+        project_src: /home/ec2-user
+        state: present
 
 
 - name: Test docker pull

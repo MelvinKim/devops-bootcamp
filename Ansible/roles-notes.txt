@@ -1,0 +1,6 @@
+Ansible roles
+- They allow to break up large playbooks into smaller manageable files --> acts like a package for your tasks
+- They have a standard file structure
+- Where to find pre-existing community Ansible Roles:
+1. Ansible Galaxy
+2. Git repositories 
